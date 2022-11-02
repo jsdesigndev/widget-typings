@@ -134,8 +134,6 @@ declare global {
   }
 
   interface WidgetPropertyMenuColorItem extends PropertyMenuItem {
-    showOnTop?: boolean;
-    height?: number;
     itemType: "color-selector";
     options: WidgetPropertyMenuColorSelectorOption[];
     selectedOption: string;
@@ -151,8 +149,6 @@ declare global {
   }
 
   interface WidgetPropertyMenuDropdownItem extends PropertyMenuItem {
-    showOnTop?: boolean;
-    height?: number;
     itemType: "dropdown";
     options: WidgetPropertyMenuDropdownOption[];
     selectedOption: string;
@@ -208,11 +204,9 @@ declare global {
   interface TextEditEvent {
     characters: string;
   }
-
   interface PlaceholderProps
     extends WidgetJSX.BlendProps,
-    Omit<WidgetJSX.TextStyleProps, "href"> { }
-
+      Omit<WidgetJSX.TextStyleProps, "href"> {}
   interface InputProps extends Omit<TextProps, "children" | "width"> {
     placeholder?: string;
     onTextEditEnd: (e: TextEditEvent) => void;
@@ -319,15 +313,26 @@ declare global {
       color: Color;
     }
 
-    export interface GradientPaint extends PaintProps {
+    export interface BaseGradientPaint extends PaintProps {
       type:
         | "gradient-linear"
         | "gradient-radial"
         | "gradient-angular"
         | "gradient-diamond";
-      gradientHandlePositions: [Vector, Vector, Vector];
       gradientStops: ColorStop[];
     }
+
+    export interface GradientPaintWithPositions extends BaseGradientPaint {
+      gradientHandlePositions: [Vector, Vector, Vector];
+    }
+
+    export interface GradientPaintWithTransform extends BaseGradientPaint {
+      gradientTransform: Transform;
+    }
+
+    export type GradientPaint =
+      | GradientPaintWithPositions
+      | GradientPaintWithTransform;
 
     export type Transform = [
       [number, number, number],
@@ -507,7 +512,12 @@ declare global {
     };
 
     interface HoverStyle {
-      fill?: HexCode | Color | Paint | (SolidPaint | GradientPaint)[];
+      fill?:
+        | HexCode
+        | Color
+        | SolidPaint
+        | GradientPaint
+        | (SolidPaint | GradientPaint)[];
       stroke?:
         | HexCode
         | Color
